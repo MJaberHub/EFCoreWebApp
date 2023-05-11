@@ -16,11 +16,12 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpPost("api/addNewCustomer")]
-        public HttpResponseMessage AddCustomer([FromBody]CustomerDto Customer)
+        public HttpResponseMessage AddCustomer([FromBody] CustomerDto Customer)
         {
 
             //here we could have a mapper between Dto and the Entity
-            
+            //TODO: MJaber: Add DAL 
+
             _context.Add<TCustomer>(new TCustomer()
             {
                 FirstName = Customer.FirstName,
@@ -30,6 +31,19 @@ namespace EFCoreWebApp.Controllers
             _context.SaveChanges();
 
             return new HttpResponseMessage();
+        }
+
+        [HttpGet("api/getCustomerInfo/{CustId}")]
+        public ActionResult<CustomerDto> GetCustomerInfo(int CustId)
+        {
+            var customer = _context.TCustomers.Find(CustId);
+
+            if (customer?.CustId != 0)
+            {
+                return Ok(customer);
+            }
+
+            return BadRequest();
         }
     }
 }
