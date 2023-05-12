@@ -4,12 +4,11 @@ namespace EFCoreWebApp.Models.DAL.Generic
 {
     public class AllRepository<T> : IAllRepository<T> where T : class
     {
-        private readonly MainDbContext _dataContext;
+        private readonly static MainDbContext _dataContext = new (); //one single instance of Dbcontext for all the controllers
         private readonly DbSet<T> _dbEntity;
-
+        
         public AllRepository()
         {
-            _dataContext = new MainDbContext();
             _dbEntity = _dataContext.Set<T>();
         }
 
@@ -31,7 +30,7 @@ namespace EFCoreWebApp.Models.DAL.Generic
 
         public void InsertModel(T model)
         {
-           _dbEntity.Add(model);
+            _dbEntity.Add(model);
         }
 
         public void Save()
