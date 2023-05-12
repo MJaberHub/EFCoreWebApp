@@ -7,9 +7,9 @@ namespace EFCoreWebApp.Models.DAL.Generic
         private readonly MainDbContext _dataContext;
         private readonly DbSet<T> _dbEntity;
 
-        public AllRepository(MainDbContext dataContext)
+        public AllRepository()
         {
-            _dataContext = dataContext;
+            _dataContext = new MainDbContext();
             _dbEntity = _dataContext.Set<T>();
         }
 
@@ -27,6 +27,11 @@ namespace EFCoreWebApp.Models.DAL.Generic
         public T GetModelById(int modelId)
         {
             return _dbEntity.Find(modelId);
+        }
+
+        public void InsertModel(T model)
+        {
+           _dbEntity.Add(model);
         }
 
         public void Save()

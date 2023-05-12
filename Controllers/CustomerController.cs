@@ -1,4 +1,5 @@
 ﻿using EFCoreWebApp.Models;
+using EFCoreWebApp.Models.DAL.Generic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EFCoreWebApp.Controllers
@@ -6,44 +7,58 @@ namespace EFCoreWebApp.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
+        private readonly IAllRepository<TCustomer> _repository;
 
-        private readonly MainDbContext _context;
-
-        public CustomerController(ILogger<CustomerController> logger, MainDbContext context)
+        public CustomerController(ILogger<CustomerController> logger)
         {
             _logger = logger;
-            _context = context;
+            _repository = new AllRepository<TCustomer>();
         }
 
         [HttpPost("api/addNewCustomer")]
-        public HttpResponseMessage AddCustomer([FromBody] CustomerDto Customer)
+        public ActionResult AddCustomer([FromBody] CustomerDto Customer)
         {
-
             //here we could have a mapper between Dto and the Entity
-            //TODO: MJaber: Add DAL 
-
-            _context.Add<TCustomer>(new TCustomer()
+            try
             {
-                FirstName = Customer.FirstName,
-                LastName = Customer.LastName
-            });
+                //changes the entity state (added, modified, deleted)
+                _repository.InsertModel(new TCustomer()
+                {
+                    FirstName = Customer.FirstName,
+                    LastName = Customer.LastName
+                });
 
-            _context.SaveChanges();
+                //when calling the savechanges the recod will be inserted
+                _repository.Save();
 
-            return new HttpResponseMessage();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("api/getCustomerInfo/{CustId}")]
         public ActionResult<CustomerDto> GetCustomerInfo(int CustId)
         {
-            var customer = _context.TCustomers.Find(CustId);
-
-            if (customer?.CustId != 0)
+            try
             {
-                return Ok(customer);
-            }
+                var customer = _repository.GetModelById(CustId);
 
-            return BadRequest();
+                if (customer?.CustId != 0)
+                {
+                    return Ok(customer);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

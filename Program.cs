@@ -11,10 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-///adding Db Context injection
-var connectionString = "\"Server=E207;Database=MainDB;Trusted_Connection=True;Trust Server Certificate = true\"";
-builder.Services.AddDbContext<MainDbContext>(
-       options => options.UseSqlServer(connectionString));
+///adding Db Context injection  //no need for DI since the instance was initiated in the Repository
+//var connectionString = "\"Server=E207;Database=MainDB;Trusted_Connection=True;Trust Server Certificate = true\"";
+//builder.Services.AddDbContext<MainDbContext>(
+//       options => options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 

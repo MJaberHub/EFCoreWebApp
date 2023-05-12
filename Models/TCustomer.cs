@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace EFCoreWebApp.Models;
 
 public partial class TCustomer
