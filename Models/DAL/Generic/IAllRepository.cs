@@ -6,7 +6,7 @@
         T GetModelById(int modelId);
         void InsertModel(T model);
         void UpdateModel (T model);
-        void DeleteModel (T modelId);
+        void DeleteModel (int modelId);
         void Save();
     }
 }

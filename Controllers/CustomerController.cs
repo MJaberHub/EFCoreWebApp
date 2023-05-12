@@ -85,5 +85,23 @@ namespace EFCoreWebApp.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("api/deleteCustomer/{CustId}")]
+        public ActionResult DeleteCustomer(int CustId)
+        {
+            try
+            {
+                _repository.DeleteModel(CustId);
+
+                _repository.Save();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

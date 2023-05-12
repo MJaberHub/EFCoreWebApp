@@ -13,7 +13,7 @@ namespace EFCoreWebApp.Models.DAL.Generic
             _dbEntity = _dataContext.Set<T>();
         }
 
-        public void DeleteModel(T modelId)
+        public void DeleteModel(int modelId)
         {
             var model = _dbEntity.Find(modelId);
             _dbEntity.Remove(model);
