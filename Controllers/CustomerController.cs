@@ -60,5 +60,30 @@ namespace EFCoreWebApp.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("api/getCustomers")]
+        public ActionResult<List<CustomerDto>> GetAllCustomers()
+        {
+            try
+            {
+                var customers = _repository.GetModel();
+
+                if (customers?.Any() ?? false)
+                {
+                    return Ok(customers.Select(item => new CustomerDto()
+                    {
+                        FirstName = item.FirstName,
+                        LastName = item.LastName
+                    }));
+                }
+
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
