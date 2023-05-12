@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCoreWebApp.Helper;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreWebApp.Models;
 
@@ -18,7 +19,7 @@ public partial class MainDbContext : DbContext
     public virtual DbSet<TCustomer> TCustomers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=E207;Database=MainDB;Trusted_Connection=True;Trust Server Certificate = true");
+        => optionsBuilder.UseSqlServer(SettingsConfigurationHelper.AppSetting("MainDBConnection"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
