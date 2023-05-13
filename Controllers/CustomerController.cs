@@ -7,12 +7,12 @@ namespace EFCoreWebApp.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
-        private readonly IAllRepository<TCustomer> _repository;
+        private readonly IRepository<TCustomer> _repository;
 
-        public CustomerController(ILogger<CustomerController> logger)
+        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository)
         {
             _logger = logger;
-            _repository = new AllRepository<TCustomer>();
+            _repository = repository;
         }
 
         [HttpPost("api/addNewCustomer")]

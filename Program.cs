@@ -1,3 +1,5 @@
+using EFCoreWebApp.Models;
+using EFCoreWebApp.Models.DAL.Generic;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,10 +18,12 @@ builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.Ge
 builder.Services.AddHangfireServer();  //the server which processes the jobs
 
 
-///adding Db Context injection  //no need for DI since the instance was initiated in the Repository
-//var connectionString = "\"Server=E207;Database=MainDB;Trusted_Connection=True;Trust Server Certificate = true\"";
-//builder.Services.AddDbContext<MainDbContext>(
-//       options => options.UseSqlServer(connectionString));
+///adding Db Context injection
+builder.Services.AddDbContext<MainDbContext>(
+       options => options.UseSqlServer(builder.Configuration.GetConnectionString("MainDB")));
+
+///DI
+builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
 
 var app = builder.Build();
 

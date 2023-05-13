@@ -2,13 +2,14 @@
 
 namespace EFCoreWebApp.Models.DAL.Generic
 {
-    public class AllRepository<T> : IAllRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly static MainDbContext _dataContext = new (); //one single instance of Dbcontext for all the controllers
+        private readonly MainDbContext _dataContext;
         private readonly DbSet<T> _dbEntity;
-        
-        public AllRepository()
+
+        public Repository(MainDbContext dataContext)
         {
+            _dataContext = dataContext;
             _dbEntity = _dataContext.Set<T>();
         }
 
