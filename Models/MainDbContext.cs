@@ -19,7 +19,7 @@ public partial class MainDbContext : DbContext
     public virtual DbSet<TCustomer> TCustomers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(SettingsConfigurationHelper.AppSetting("MainDBConnection"));
+        => optionsBuilder.UseSqlServer(SettingsConfigurationHelper.GetConnectionString("MainDB"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

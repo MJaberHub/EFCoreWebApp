@@ -8,7 +8,13 @@
 
         public static string AppSetting(string Key)
         {
-            _appSettings = GetCurrentSettings(Key);
+            _appSettings = GetCurrentSettings("ApplicationSettings", Key);
+            return _appSettings.appSettingValue;
+        }
+
+        public static string GetConnectionString(string Key)
+        {
+            _appSettings = GetCurrentSettings("ConnectionStrings", Key);
             return _appSettings.appSettingValue;
         }
 
@@ -19,7 +25,7 @@
 
         // Get a valued stored in the appsettings.
         // Pass in a key like TestArea:TestKey to get TestValue
-        private static SettingsConfigurationHelper GetCurrentSettings(string Key)
+        private static SettingsConfigurationHelper GetCurrentSettings(string section, string Key)
         {
             var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
@@ -27,7 +33,7 @@
 
             IConfigurationRoot configuration = builder.Build();
 
-            var settings = new SettingsConfigurationHelper(configuration.GetSection("ApplicationSettings"), Key);
+            var settings = new SettingsConfigurationHelper(configuration.GetSection(section), Key);
 
             return settings;
         }
