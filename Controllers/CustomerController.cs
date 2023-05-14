@@ -44,7 +44,6 @@ namespace EFCoreWebApp.Controllers
         [HttpPost("api/addNewCustomerAsync")]
         public ActionResult AddCustomerAsync([FromBody] CustomerDto Customer)
         {
-            //here we could have a mapper between Dto and the Entity
             try
             {
                 var jobId = BackgroundJob.Enqueue(() => _repository.InsertModel(new TCustomer()
