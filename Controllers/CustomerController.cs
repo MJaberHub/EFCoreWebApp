@@ -1,5 +1,6 @@
 ﻿using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL.Generic;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EFCoreWebApp.Controllers
@@ -30,6 +31,29 @@ namespace EFCoreWebApp.Controllers
 
                 //when calling the savechanges the recod will be inserted
                 _repository.Save();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("api/addNewCustomerAsync")]
+        public ActionResult AddCustomerAsync([FromBody] CustomerDto Customer)
+        {
+            //here we could have a mapper between Dto and the Entity
+            try
+            {
+                var jobId = BackgroundJob.Enqueue(() => _repository.InsertModel(new TCustomer()
+                {
+                    FirstName = Customer.FirstName,
+                    LastName = Customer.LastName
+                }));
+
+                BackgroundJob.ContinueJobWith(jobId, () => _repository.Save());
 
                 return Ok();
             }
