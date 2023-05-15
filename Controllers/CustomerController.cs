@@ -41,28 +41,6 @@ namespace EFCoreWebApp.Controllers
             }
         }
 
-        [HttpPost("api/addNewCustomerAsync")]
-        public ActionResult AddCustomerAsync([FromBody] CustomerDto Customer)
-        {
-            try
-            {
-                var jobId = BackgroundJob.Enqueue(() => _repository.InsertModel(new TCustomer()
-                {
-                    FirstName = Customer.FirstName,
-                    LastName = Customer.LastName
-                }));
-
-                BackgroundJob.ContinueJobWith(jobId, () => _repository.Save());
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug(ex.Message);
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpGet("api/getCustomerInfo/{CustId}")]
         public ActionResult<CustomerDto> GetCustomerInfo(int CustId)
         {
