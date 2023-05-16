@@ -2,6 +2,7 @@ using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL.Generic;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,12 @@ builder.Services.AddDbContext<MainDbContext>(
 
 ///DI
 builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
+
+
+///Serilog Config ///Serilog implements the ILogger interface existing in the Microsoft.Extension by this Serilog was injected
+Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext().CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(Log.Logger);
 
 var app = builder.Build();
 
