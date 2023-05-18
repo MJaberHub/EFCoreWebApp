@@ -5,13 +5,12 @@ namespace EFCoreWebApp.Models;
 
 public partial class MainDbContext : DbContext
 {
-    public MainDbContext()
-    {
-    }
+    private readonly IConfiguration _configuration;
 
-    public MainDbContext(DbContextOptions<MainDbContext> options)
+    public MainDbContext(DbContextOptions<MainDbContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<TAccount> TAccounts { get; set; }
@@ -19,7 +18,7 @@ public partial class MainDbContext : DbContext
     public virtual DbSet<TCustomer> TCustomers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(SettingsConfigurationHelper.GetConnectionString("MainDB"));
+        => optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MainDB"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
