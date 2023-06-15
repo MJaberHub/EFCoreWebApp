@@ -32,7 +32,7 @@ namespace EFCoreWebApp.Controllers
                 //when calling the savechanges the recod will be inserted
                 _repository.Save();
 
-                return Ok();
+                return Ok(Guid.NewGuid());
             }
             catch (Exception ex)
             {
