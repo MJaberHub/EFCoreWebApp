@@ -1,6 +1,6 @@
 ﻿using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL.Generic;
-using Hangfire;
+using EFCoreWebApp.Validator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EFCoreWebApp.Controllers
@@ -17,22 +17,48 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpPost("api/addNewCustomer")]
-        public ActionResult AddCustomer([FromBody] CustomerDto Customer)
+        public async Task<IActionResult> AddCustomer([FromBody] CustomerRequest Customer)
         {
             //here we could have a mapper between Dto and the Entity
             try
             {
-                //changes the entity state (added, modified, deleted)
-                _repository.InsertModel(new TCustomer()
+                #region ValidateRequest
+                var validator = new AddCustomerValidator();
+
+                // Execute the validator
+                var result = validator.Validate(Customer);
+
+                // Inspect any validation failures.
+                var success = result.IsValid;
+
+                if(!success)
+                {
+                    var failures = result.Errors;
+                    return BadRequest(failures);
+                }
+                #endregion
+
+                var newCustomer = new TCustomer()
                 {
                     FirstName = Customer.FirstName,
                     LastName = Customer.LastName
-                });
+                };
+
+                //changes the entity state (added, modified, deleted)
+                _repository.InsertModel(newCustomer);
 
                 //when calling the savechanges the recod will be inserted
                 _repository.Save();
 
-                return Ok(Guid.NewGuid());
+                return Ok(new CustomerResponse()
+                {
+                    CustId = newCustomer.CustId,
+                    FirstName = newCustomer.FirstName,
+                    LastName = newCustomer.LastName,
+                    CreatedBy = newCustomer.CreatedBy,
+                    DateCreated = newCustomer.DateCreated,
+                    DateModified = newCustomer.DateModifed
+                });
             }
             catch (Exception ex)
             {
@@ -42,7 +68,7 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpGet("api/getCustomerInfo/{CustId}")]
-        public ActionResult<CustomerDto> GetCustomerInfo(int CustId)
+        public ActionResult<CustomerRequest> GetCustomerInfo(int CustId)
         {
             try
             {
@@ -63,7 +89,7 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpGet("api/getCustomers")]
-        public ActionResult<List<CustomerDto>> GetAllCustomers()
+        public ActionResult<List<CustomerRequest>> GetAllCustomers()
         {
             try
             {
@@ -71,7 +97,7 @@ namespace EFCoreWebApp.Controllers
 
                 if (customers?.Any() ?? false)
                 {
-                    return Ok(customers.Select(item => new CustomerDto()
+                    return Ok(customers.Select(item => new CustomerRequest()
                     {
                         FirstName = item.FirstName,
                         LastName = item.LastName
