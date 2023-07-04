@@ -1,4 +1,5 @@
 ﻿using EFCoreWebApp.Models;
+using EFCoreWebApp.Models.DAL;
 using EFCoreWebApp.Models.DAL.Generic;
 using EFCoreWebApp.Validator;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,14 @@ namespace EFCoreWebApp.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
-        private readonly IRepository<TCustomer> _repository;
+        private readonly IRepository<TCustomer> _repository; //generic repo
+        private readonly ICustomerRepository _customerRepository; //specific repo
 
-        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository)
+        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository)
         {
             _logger = logger;
             _repository = repository;
+            _customerRepository = customerRepository;
         }
 
         [HttpPost("api/addNewCustomer")]
@@ -31,7 +34,7 @@ namespace EFCoreWebApp.Controllers
                 // Inspect any validation failures.
                 var success = result.IsValid;
 
-                if(!success)
+                if (!success)
                 {
                     var failures = result.Errors;
                     return BadRequest(failures);
@@ -68,7 +71,7 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpGet("api/getCustomerInfo/{CustId}")]
-        public ActionResult<CustomerRequest> GetCustomerInfo(int CustId)
+        public async Task<IActionResult> GetCustomerInfo(int CustId)
         {
             try
             {
@@ -89,7 +92,7 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpGet("api/getCustomers")]
-        public ActionResult<List<CustomerRequest>> GetAllCustomers()
+        public async Task<IActionResult> GetAllCustomers()
         {
             try
             {
@@ -114,7 +117,7 @@ namespace EFCoreWebApp.Controllers
         }
 
         [HttpDelete("api/deleteCustomer/{CustId}")]
-        public ActionResult DeleteCustomer(int CustId)
+        public async Task<IActionResult> DeleteCustomer(int CustId)
         {
             try
             {
