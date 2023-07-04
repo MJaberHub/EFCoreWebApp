@@ -1,4 +1,5 @@
 using EFCoreWebApp.Models;
+using EFCoreWebApp.Models.DAL;
 using EFCoreWebApp.Models.DAL.Generic;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<MainDbContext>(
 
 ///DI
 builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 
 ///Serilog Config ///Serilog implements the ILogger interface existing in the Microsoft.Extension by this Serilog was injected

@@ -1,48 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCoreWebApp.Models.DAL.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreWebApp.Models.DAL
 {
-    public class CustomerRepository : ICustomerRepository
+    public class CustomerRepository : Repository<TCustomer>, ICustomerRepository
     {
         private readonly MainDbContext _dataContext;
-        public CustomerRepository(MainDbContext dataContext)
+        public CustomerRepository(MainDbContext dataContext) : base(dataContext)
         {
             _dataContext = dataContext;
         }
 
-        public void DeleteCustomer(int customerId)
+        public TCustomer GetCustomerByFirstAndLastName(string firstName, string lastName)
         {
-            var customer = _dataContext.TCustomers.Find(customerId);
-
-            if (customer?.CustId != 0)
-            {
-                _dataContext.TCustomers.Remove(customer);
-            }
+            return _dataContext.TCustomers.FirstOrDefault(item => item.FirstName.ToUpper().Equals(firstName.ToUpper()) && item.LastName.ToUpper().Equals(lastName.ToUpper()));
         }
 
-        public TCustomer GetCustomerById(int customerId)
+        public IEnumerable<TCustomer> GetCustomerByFirstName(string firstName)
         {
-            return _dataContext.TCustomers.Find(customerId);
+            return _dataContext.TCustomers.Where(item => item.FirstName.ToUpper().Equals(firstName.ToUpper())).ToList();
         }
 
-        public IEnumerable<TCustomer> GetCustomers()
+        public IEnumerable<TCustomer> GetCustomerByLastName(string lastName)
         {
-            return _dataContext.TCustomers.ToList();
-        }
-
-        public void InsertCustomer(TCustomer customer)
-        {
-            _dataContext.TCustomers.Add(customer);
-        }
-
-        public void SaveChanges()
-        {
-            _dataContext.SaveChanges();
-        }
-
-        public void UpdateCustomer(TCustomer customer)
-        {
-            _dataContext.Entry(customer).State = EntityState.Modified;
+            return _dataContext.TCustomers.Where(item => item.LastName.ToUpper().Equals(lastName.ToUpper())).ToList();
         }
     }
 }
