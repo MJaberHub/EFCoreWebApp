@@ -43,6 +43,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//implementing minimal APIs // should come after building the services to be able to use them
+app.MapGet("/AllCustomer", (ICustomerRepository customerRepo) =>
+{
+    try
+    {
+        return Results.Ok(customerRepo.GetModel()); //handles the status code
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex);
+    }
+});
+
+app.MapGet("/AllCustomer/{id:int}", (int id, ICustomerRepository customerRepo) =>
+{
+    return customerRepo.GetModelById(id);
+});
+
 ///Hangfire config
 app.UseHangfireDashboard();
 
