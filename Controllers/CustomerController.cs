@@ -1,8 +1,10 @@
 ﻿using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL;
 using EFCoreWebApp.Models.DAL.Generic;
+using EFCoreWebApp.Services;
 using EFCoreWebApp.Validator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 
 namespace EFCoreWebApp.Controllers
 {
@@ -11,12 +13,14 @@ namespace EFCoreWebApp.Controllers
         private readonly ILogger<CustomerController> _logger;
         private readonly IRepository<TCustomer> _repository; //generic repo
         private readonly ICustomerRepository _customerRepository; //specific repo
+        private readonly IBankLookUpService _bankLookUpService;
 
-        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository)
+        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository, IBankLookUpService bankLookUpService)
         {
             _logger = logger;
             _repository = repository;
             _customerRepository = customerRepository;
+            _bankLookUpService = bankLookUpService;
         }
 
         [HttpPost("api/addNewCustomer")]
@@ -50,7 +54,7 @@ namespace EFCoreWebApp.Controllers
                 //changes the entity state (added, modified, deleted)
                 _repository.InsertModel(newCustomer);
 
-                //when calling the savechanges the recod will be inserted
+                //when calling the savechanges the record will be inserted
                 _repository.Save();
 
                 return Ok(new CustomerResponse()
@@ -100,10 +104,14 @@ namespace EFCoreWebApp.Controllers
 
                 if (customers?.Any() ?? false)
                 {
-                    return Ok(customers.Select(item => new CustomerRequest()
+                    return Ok(customers.Select(item => new CustomerResponse()
                     {
+                        CustId = item.CustId,
                         FirstName = item.FirstName,
-                        LastName = item.LastName
+                        LastName = item.LastName,
+                        CreatedBy = item.CreatedBy,
+                        DateCreated = item.DateCreated,
+                        DateModified = item.DateModifed
                     }));
                 }
 
@@ -126,6 +134,22 @@ namespace EFCoreWebApp.Controllers
                 _repository.Save();
 
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("api/getBankList")]
+        public async Task<IActionResult> GetBankList()
+        {
+            try
+            {
+                var response = await _bankLookUpService.GetBankList();
+
+                return Ok(response);
             }
             catch (Exception ex)
             {

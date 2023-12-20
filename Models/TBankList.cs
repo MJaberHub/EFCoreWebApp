@@ -9,7 +9,7 @@ public partial class TBankList
 
     public string NameEn { get; set; }
 
-    public string ImageUrl { get; set; }
+    public string? ImageUrl { get; set; }
 
     public int? StatusId { get; set; }
 

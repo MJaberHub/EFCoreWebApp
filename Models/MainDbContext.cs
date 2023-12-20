@@ -6,13 +6,16 @@ namespace EFCoreWebApp.Models;
 
 public partial class MainDbContext : DbContext
 {
-    public MainDbContext()
+    private readonly IConfiguration _configuration;
+    public MainDbContext(IConfiguration configuration)
     {
+        _configuration = configuration;
     }
 
-    public MainDbContext(DbContextOptions<MainDbContext> options)
+    public MainDbContext(DbContextOptions<MainDbContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<TAccount> TAccounts { get; set; }
@@ -22,8 +25,7 @@ public partial class MainDbContext : DbContext
     public virtual DbSet<TCustomer> TCustomers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=MJaber_XPS;Database=MainDB;Trusted_Connection=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MainDB"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

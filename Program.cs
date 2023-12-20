@@ -1,6 +1,7 @@
 using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL;
 using EFCoreWebApp.Models.DAL.Generic;
+using EFCoreWebApp.Services;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -26,8 +27,12 @@ builder.Services.AddDbContext<MainDbContext>(
 
 ///DI
 builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
+builder.Services.AddScoped<IRepository<TBankList>, Repository<TBankList>>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IBankLookUpService, BankLookUpService>();
 
+///Memory Cache
+builder.Services.AddMemoryCache();
 
 ///Serilog Config ///Serilog implements the ILogger interface existing in the Microsoft.Extension by this Serilog was injected
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext().CreateLogger();
