@@ -98,30 +98,49 @@ namespace EFCoreWebApp.Controllers
         [HttpGet("api/getCustomers")]
         public async Task<IActionResult> GetAllCustomers()
         {
-            try
-            {
-                var customers = _repository.GetModel();
+            /* try
+             {
+                 var customers = _repository.GetModel();
 
-                if (customers?.Any() ?? false)
+                 if (customers?.Any() ?? false)
+                 {
+                     return Ok(customers.Select(item => new CustomerResponse()
+                     {
+                         CustId = item.CustId,
+                         FirstName = item.FirstName,
+                         LastName = item.LastName,
+                         CreatedBy = item.CreatedBy,
+                         DateCreated = item.DateCreated,
+                         DateModified = item.DateModifed
+                     }));
+                 }
+
+                 return BadRequest();
+             }
+             catch (Exception ex)
+             {
+                 _logger.LogDebug(ex.Message);
+                 return BadRequest(ex.Message);
+             }*/
+
+            var customers = _repository.GetModel();
+
+            throw new Exception();
+
+            if (customers?.Any() ?? false)
+            {
+                return Ok(customers.Select(item => new CustomerResponse()
                 {
-                    return Ok(customers.Select(item => new CustomerResponse()
-                    {
-                        CustId = item.CustId,
-                        FirstName = item.FirstName,
-                        LastName = item.LastName,
-                        CreatedBy = item.CreatedBy,
-                        DateCreated = item.DateCreated,
-                        DateModified = item.DateModifed
-                    }));
-                }
+                    CustId = item.CustId,
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    CreatedBy = item.CreatedBy,
+                    DateCreated = item.DateCreated,
+                    DateModified = item.DateModifed
+                }));
+            }
 
-                return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug(ex.Message);
-                return BadRequest(ex.Message);
-            }
+            return BadRequest();
         }
 
         [HttpDelete("api/deleteCustomer/{CustId}")]
