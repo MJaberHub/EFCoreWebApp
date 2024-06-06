@@ -1,5 +1,6 @@
 ﻿using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL;
+using EFCoreWebApp.Models.DAL.DapperDAL;
 using EFCoreWebApp.Models.DAL.Generic;
 using EFCoreWebApp.Validator;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,14 @@ namespace EFCoreWebApp.Controllers
         private readonly ILogger<CustomerController> _logger;
         private readonly IRepository<TCustomer> _repository; //generic repo
         private readonly ICustomerRepository _customerRepository; //specific repo
+        private readonly ICustomerRepositoryDapper _customerRepositoryDapper;
 
-        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository)
+        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository, ICustomerRepositoryDapper customerRepositoryDapper)
         {
             _logger = logger;
             _repository = repository;
             _customerRepository = customerRepository;
+            _customerRepositoryDapper = customerRepositoryDapper;
         }
 
         [HttpPost("api/addNewCustomer")]
@@ -60,7 +63,7 @@ namespace EFCoreWebApp.Controllers
                     LastName = newCustomer.LastName,
                     CreatedBy = newCustomer.CreatedBy,
                     DateCreated = newCustomer.DateCreated,
-                    DateModified = newCustomer.DateModifed
+                    DateModified = newCustomer.DateModified
                 });
             }
             catch (Exception ex)
@@ -75,9 +78,12 @@ namespace EFCoreWebApp.Controllers
         {
             try
             {
-                var customer = _repository.GetModelById(CustId);
+                var customer = await _customerRepositoryDapper.GetCustomerAsync(new()
+                {
+                    CustId = CustId
+                });
 
-                if (customer?.CustId != 0)
+                if ((customer?.FirstOrDefault()?.CustId ?? 0) > 0)
                 {
                     return Ok(customer);
                 }

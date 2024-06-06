@@ -67,10 +67,10 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("DATE_CREATED");
-            entity.Property(e => e.DateModifed)
+            entity.Property(e => e.DateModified)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
-                .HasColumnName("DATE_MODIFED");
+                .HasColumnName("DATE_MODIFIED");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
                 .IsUnicode(false)
