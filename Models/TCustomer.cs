@@ -13,7 +13,7 @@ public partial class TCustomer
 
     public DateTime? DateCreated { get; set; }
 
-    public DateTime? DateModifed { get; set; }
+    public DateTime? DateModified { get; set; }
 
     public virtual ICollection<TAccount> TAccounts { get; set; } = new List<TAccount>();
 }
