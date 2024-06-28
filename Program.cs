@@ -1,5 +1,6 @@
 using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL;
+using EFCoreWebApp.Models.DAL.Cache;
 using EFCoreWebApp.Models.DAL.DapperDAL;
 using EFCoreWebApp.Models.DAL.Generic;
 using Hangfire;
@@ -18,17 +19,26 @@ builder.Services.AddSwaggerGen();
 
 ///Hangfire config
 builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireDB")));
-builder.Services.AddHangfireServer();  //the server which processes the jobs
+//builder.Services.AddHangfireServer();  //the server which processes the jobs
 
 
 ///adding Db Context injection
 builder.Services.AddDbContext<MainDbContext>(
        options => options.UseSqlServer(builder.Configuration.GetConnectionString("MainDB")));
 
+//Redis connection string
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["RedisCache:Connection"];
+    options.InstanceName = builder.Configuration["RedisCache:InstanceName"];
+});
+
 ///DI
 builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerRepositoryDapper, CustomerRepositoryDapper>();
+builder.Services.AddScoped<IRepository<TBankList>, Repository<TBankList>>();
+builder.Services.AddScoped<ICachedRepo, CachedRepo>();
 
 
 ///Serilog Config ///Serilog implements the ILogger interface existing in the Microsoft.Extension by this Serilog was injected

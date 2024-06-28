@@ -1,5 +1,4 @@
-﻿
-namespace EFCoreWebApp.Models;
+﻿namespace EFCoreWebApp.Models;
 
 public partial class TAccount
 {
