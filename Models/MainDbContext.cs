@@ -1,24 +1,27 @@
-﻿using EFCoreWebApp.Helper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreWebApp.Models;
 
 public partial class MainDbContext : DbContext
 {
-    private readonly IConfiguration _configuration;
-
-    public MainDbContext(DbContextOptions<MainDbContext> options, IConfiguration configuration)
-        : base(options)
+    public MainDbContext()
     {
-        _configuration = configuration;
+
+    }
+
+    public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
+    {
+
     }
 
     public virtual DbSet<TAccount> TAccounts { get; set; }
 
+    public virtual DbSet<TBankList> TBankLists { get; set; }
+
     public virtual DbSet<TCustomer> TCustomers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MainDB"));
+        => optionsBuilder.UseSqlServer("Server=MJaber_XPS;Database=MainDB;Trusted_Connection=True;Trust Server Certificate = true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,6 +30,8 @@ public partial class MainDbContext : DbContext
             entity.HasKey(e => e.AccountId).HasName("PK__T_ACCOUN__05B22F601D9B2048");
 
             entity.ToTable("T_ACCOUNTS");
+
+            entity.HasIndex(e => e.CustId, "IX_T_ACCOUNTS_CUST_ID");
 
             entity.Property(e => e.AccountId).HasColumnName("ACCOUNT_ID");
             entity.Property(e => e.AccountName)
@@ -52,6 +57,34 @@ public partial class MainDbContext : DbContext
                 .HasConstraintName("FK__T_ACCOUNT__CUST___3B75D760");
         });
 
+        modelBuilder.Entity<TBankList>(entity =>
+        {
+            entity.HasKey(e => e.BankId).HasName("PK__T_BANK_L__06D33C4674A2DD9D");
+
+            entity.ToTable("T_BANK_LIST");
+
+            entity.Property(e => e.BankId).HasColumnName("BANK_ID");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("DATE_CREATED");
+            entity.Property(e => e.DateModified)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("DATE_MODIFIED");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("IMAGE_URL");
+            entity.Property(e => e.NameEn)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NAME_EN");
+            entity.Property(e => e.StatusId)
+                .HasDefaultValueSql("((0))")
+                .HasColumnName("STATUS_ID");
+        });
+
         modelBuilder.Entity<TCustomer>(entity =>
         {
             entity.HasKey(e => e.CustId).HasName("PK__T_CUSTOM__93ABC0033BEC0F36");
@@ -67,10 +100,10 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("DATE_CREATED");
-            entity.Property(e => e.DateModifed)
+            entity.Property(e => e.DateModified)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
-                .HasColumnName("DATE_MODIFED");
+                .HasColumnName("DATE_MODIFIED");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
                 .IsUnicode(false)

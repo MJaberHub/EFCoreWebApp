@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
 namespace EFCoreWebApp.Models;
 
 public partial class TCustomer
@@ -13,7 +15,7 @@ public partial class TCustomer
 
     public DateTime? DateCreated { get; set; }
 
-    public DateTime? DateModifed { get; set; }
+    public DateTime? DateModified { get; set; }
 
     public virtual ICollection<TAccount> TAccounts { get; set; } = new List<TAccount>();
 }
