@@ -60,7 +60,7 @@ namespace EFCoreWebApp.Controllers
                     LastName = newCustomer.LastName,
                     CreatedBy = newCustomer.CreatedBy,
                     DateCreated = newCustomer.DateCreated,
-                    DateModified = newCustomer.DateModifed
+                    DateModified = newCustomer.DateModified
                 });
             }
             catch (Exception ex)
