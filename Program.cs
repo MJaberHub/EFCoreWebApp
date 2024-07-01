@@ -33,12 +33,16 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = builder.Configuration["RedisCache:InstanceName"];
 });
 
+//in memory cache
+builder.Services.AddMemoryCache();
+
 ///DI
 builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerRepositoryDapper, CustomerRepositoryDapper>();
 builder.Services.AddScoped<IRepository<TBankList>, Repository<TBankList>>();
-builder.Services.AddScoped<ICachedRepo, CachedRepo>();
+//builder.Services.AddScoped<ICachedRepo, CachedRepo>();
+builder.Services.AddScoped<ICachedRepo, CachedRepoMemory>();
 
 
 ///Serilog Config ///Serilog implements the ILogger interface existing in the Microsoft.Extension by this Serilog was injected
