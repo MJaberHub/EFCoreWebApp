@@ -1,8 +1,10 @@
-﻿using EFCoreWebApp.Models;
+﻿using EFCoreWebApp.CQRSMediator;
+using EFCoreWebApp.Models;
 using EFCoreWebApp.Models.DAL;
 using EFCoreWebApp.Models.DAL.DapperDAL;
 using EFCoreWebApp.Models.DAL.Generic;
 using EFCoreWebApp.Validator;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EFCoreWebApp.Controllers
@@ -13,17 +15,19 @@ namespace EFCoreWebApp.Controllers
         private readonly IRepository<TCustomer> _repository; //generic repo
         private readonly ICustomerRepository _customerRepository; //specific repo
         private readonly ICustomerRepositoryDapper _customerRepositoryDapper;
+        private readonly IMediator _mediator;
 
-        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository, ICustomerRepositoryDapper customerRepositoryDapper)
+        public CustomerController(ILogger<CustomerController> logger, IRepository<TCustomer> repository, ICustomerRepository customerRepository, ICustomerRepositoryDapper customerRepositoryDapper, IMediator mediator)
         {
             _logger = logger;
             _repository = repository;
             _customerRepository = customerRepository;
             _customerRepositoryDapper = customerRepositoryDapper;
+            _mediator = mediator;
         }
 
-        [HttpPost("api/addNewCustomer")]
-        public async Task<IActionResult> AddCustomer([FromBody] CustomerRequest Customer)
+        [HttpPost("api/v1/addNewCustomer")]
+        public async Task<IActionResult> AddCustomerV1([FromBody] CustomerRequest Customer)
         {
             //here we could have a mapper between Dto and the Entity
             try
@@ -73,8 +77,54 @@ namespace EFCoreWebApp.Controllers
             }
         }
 
-        [HttpGet("api/getCustomerInfo/{CustId}")]
-        public async Task<IActionResult> GetCustomerInfo(int CustId)
+
+        [HttpPost("api/v2/addNewCustomer")]
+        public async Task<IActionResult> AddCustomerV2([FromBody] CustomerRequest Customer)
+        {
+            //here we could have a mapper between Dto and the Entity
+            try
+            {
+                #region ValidateRequest
+                var validator = new AddCustomerValidator();
+
+                // Execute the validator
+                var result = validator.Validate(Customer);
+
+                // Inspect any validation failures.
+                var success = result.IsValid;
+
+                if (!success)
+                {
+                    var failures = result.Errors;
+                    return BadRequest(failures);
+                }
+                #endregion
+
+                var newCustomer = await _mediator.Send(new CreateCustomerCommand()
+                {
+                    FirstName = Customer.FirstName,
+                    LastName = Customer.LastName
+                });
+
+                return Ok(new CustomerResponse()
+                {
+                    CustId = newCustomer.CustId,
+                    FirstName = newCustomer.FirstName,
+                    LastName = newCustomer.LastName,
+                    CreatedBy = newCustomer.CreatedBy,
+                    DateCreated = newCustomer.DateCreated,
+                    DateModified = newCustomer.DateModified
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("api/v1/getCustomerInfo/{CustId}")]
+        public async Task<IActionResult> GetCustomerInfoV1(int CustId)
         {
             try
             {
@@ -84,6 +134,27 @@ namespace EFCoreWebApp.Controllers
                 });
 
                 if ((customer?.FirstOrDefault()?.CustId ?? 0) > 0)
+                {
+                    return Ok(customer);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("api/v2/getCustomerInfo/{CustId}")]
+        public async Task<IActionResult> GetCustomerInfoV2(int CustId)
+        {
+            try
+            {
+                var customer = await _mediator.Send(new GetCustomerQuery() { CustomerId = CustId });
+
+                if ((customer?.CustId ?? 0) > 0)
                 {
                     return Ok(customer);
                 }

@@ -17,5 +17,6 @@ public partial class TCustomer
 
     public DateTime? DateModified { get; set; }
 
-    public virtual ICollection<TAccount> TAccounts { get; set; } = new List<TAccount>();
+    //Navigation Property
+    public virtual ICollection<TAccount> TAccounts { get; set; } = [];
 }

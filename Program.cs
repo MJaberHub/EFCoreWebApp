@@ -36,6 +36,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
 //in memory cache
 builder.Services.AddMemoryCache();
 
+//MediatR DI
+builder.Services.AddMediatR(cf => cf.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 ///DI
 builder.Services.AddScoped<IRepository<TCustomer>, Repository<TCustomer>>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
